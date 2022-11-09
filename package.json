@@ -1,0 +1,50 @@
+{
+  "name": "verdaccio-package-count",
+  "version": "0.0.5",
+  "description": "An amazing verdaccio plugin",
+  "main": "lib/server/index.js",
+  "types": "lib/server/index.d.ts",
+  "files": [
+    "lib/"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.5.0",
+    "@types/fs-extra": "^9.0.13",
+    "@verdaccio/commons-api": "^10.2.0",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.4",
+    "@types/jest": "^29.2.1",
+    "@types/node": "^18.11.8",
+    "@types/styled-components": "^5.1.26",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@verdaccio/babel-preset": "^9.6.1",
+    "@verdaccio/eslint-config": "^10.0.0",
+    "@verdaccio/types": "^10.7.0",
+    "eslint": "^8.26.0",
+    "jest": "^29.2.2 ",
+    "prettier": "^2.7.1",
+    "standard-version": "^9.5.0",
+    "ts-jest": "^29.0.3",
+    "typescript": "^4.8.4"
+  },
+  "keywords": [
+    "verdaccio-"
+  ],
+  "license": "MIT",
+  "repository": "joebnb/download-count",
+  "author": "joebnb <joebnb@qq.com>",
+  "scripts": {
+    "release": "standard-version -a -s",
+    "build": "npm run build:types && npm run build:js && cd src/client && npm run build",
+    "dev": "cd src/client && npm run dev & babel --watch src/server/ --out-dir lib/server/ --extensions \".ts,.tsx\"",
+    "build:js": "babel src/server --out-dir lib/server --extensions \".ts,.tsx\"",
+    "build:types": "tsc --emitDeclarationOnly",
+    "test": "jest",
+    "lint": "eslint \"**/*.{js,ts}\""
+  }
+}
