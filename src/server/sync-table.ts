@@ -1,16 +1,14 @@
 import { getElastic } from './util/elastic';
 import { getWeekIndex } from './util/date';
 
-import { PluginConfig, CountModel, SyncPackageMapItem, MiddlewareConfig } from './index.type';
+import { PluginConfig, CountModel, SyncPackageMapItem, MiddlewareConfig, SyncMap } from './index.type';
 
 export const count_index = 'npm_analysis_packages';
 export class SyncTable {
     config: PluginConfig;
     middlewareConfig: MiddlewareConfig;
     filter: RegExp[];
-    private syncMap: {
-        [package_name: string]: SyncPackageMapItem;
-    } = {};
+    private syncMap: SyncMap = {};
 
     constructor(config: PluginConfig) {
         this.config = config;
@@ -19,6 +17,9 @@ export class SyncTable {
     }
 
     countPackage(package_name, version) {
+        this.syncMap['_total'] ||= { count: 0, name: '_total', versions: {} };
+        this.syncMap['_total'].count++;
+
         this.syncMap[package_name] ||= {
             name: package_name,
             count: 0,
@@ -26,19 +27,22 @@ export class SyncTable {
         };
         this.syncMap[package_name].count++;
 
-        this.syncMap[package_name].versions[version] ||= 0;
-        this.syncMap[package_name].versions[version]++;
+        if (version) {
+            this.syncMap[package_name].versions[version] ||= 0;
+            this.syncMap[package_name].versions[version]++;
+        }
     }
 
     private syncSchedule() {
         setInterval(async () => {
+            const now = new Date();
             Object.values(this.syncMap).forEach((item) => {
-                this.updateDatabase(item);
+                this.update(item, now);
             });
         }, this.middlewareConfig.sync_interval || 120 * 1000);
     }
 
-    async updateDatabase(package_count: SyncPackageMapItem) {
+    async update(package_count: SyncPackageMapItem, nowDate: Date) {
         const elastic = getElastic(this.config);
         try {
             const data = await elastic.getSource<CountModel>({
@@ -51,7 +55,6 @@ export class SyncTable {
             });
 
             const dataDate = new Date(data.update_at);
-            const nowDate = new Date();
 
             const this_week = getWeekIndex(dataDate.getTime()) == getWeekIndex() ? data.this_week + package_count.count : package_count.count;
             let trend = data.trend || [...new Array(29).fill(0), 1];
@@ -72,7 +75,7 @@ export class SyncTable {
                     trend,
                     package_name: package_count.name,
                     versions: { ...data.versions },
-                    update_at: Date.now(),
+                    update_at: nowDate.toISOString(),
                 },
             });
             delete this.syncMap[package_count.name];
@@ -101,14 +104,13 @@ export class SyncTable {
         delete this.syncMap[package_count.name];
     }
 
-    async queryDatabase(package_name: string) {
+    async query(package_name: string) {
         const elastic = getElastic(this.config);
         try {
-            const result = await elastic.getSource({
+            return await elastic.getSource({
                 index: count_index,
                 id: package_name,
             });
-            return result;
         } catch (error) {
             console.error(error);
             if (JSON.stringify(error).indexOf('not_found_exception')) return { error: 'no_record' };

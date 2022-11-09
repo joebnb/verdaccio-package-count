@@ -44,5 +44,9 @@ export interface CountModel {
     versions: {
         [version: string]: number;
     };
-    update_at: number;
+    update_at: string;
+}
+
+export class SyncMap {
+    [package_name: string]: SyncPackageMapItem;
 }
