@@ -17,18 +17,18 @@ export const Overlay = ({ data }: { data: number[] | undefined }) => {
     const onMouseMove = (evt: Event) => {
         thrott(() => {
             if (!ref.current) return;
-            const x = evt?.nativeEvent?.layerX;
-            const y = evt?.nativeEvent?.layerY;
+            const x = (evt as any).nativeEvent?.layerX;
+            const y = (evt as any).nativeEvent?.layerY;
             const width = (ref.current as HTMLElement).getBoundingClientRect().width;
 
-            const dataLen = data.length;
-            const index = Math.floor((x / width) * dataLen);
+            const dataLen = data?.length || 0;
+            const index = Math.floor((x / width) * (dataLen-1));
 
             setPos({
                 x: x - 80,
                 y: y + 20,
                 visibility: 'visible',
-                text: `week:${dataLen - index} download:${data[index]}`,
+                text: `week:${dataLen - index} download:${(data || [])[index]}`,
             });
         });
     };

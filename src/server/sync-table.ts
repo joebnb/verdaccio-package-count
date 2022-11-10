@@ -57,7 +57,7 @@ export class SyncTable {
             //     this.update(item, now);
             // });
             this.bulkUpdate(this.syncMap, new Date());
-        }, 6000 || 120 * 1000);
+        }, this.middlewareConfig.sync_interval || 600 * 1000);
     }
 
     async bulkUpdate(syncMap: SyncMap, nowDate: Date) {

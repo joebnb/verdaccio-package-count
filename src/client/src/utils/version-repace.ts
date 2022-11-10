@@ -9,7 +9,7 @@ export function replaceVersion() {
             const versionItems = document.getElementsByClassName('version-item');
             const isRenderd = !!document.getElementsByClassName('npm-version-count').length;
             if (isRenderd) return;
-            Array.from(versionItems).forEach((item: HTMLElement) => {
+            Array.from(versionItems).forEach((item) => {
                 const currentVersion = item.childNodes[0].textContent || '';
                 if (currentVersion && data.versions[currentVersion]) {
                     const div = document.createElement('div');

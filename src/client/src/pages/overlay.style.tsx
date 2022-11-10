@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export const Tips = styled.div<{ pos: { x: number; y: number; visibility: 'hidden' | 'visible'; text?: string } }>`
+export const Tips = styled.div<{ pos: any }>`
     position: absolute;
     color: #fff;
     background-color: rgba(0, 0, 0, 0.7);
