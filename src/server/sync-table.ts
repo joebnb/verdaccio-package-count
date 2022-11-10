@@ -1,9 +1,11 @@
 import { getElastic } from './util/elastic';
 import { getWeekIndex } from './util/date';
+import { countScript } from './util/scripts';
 
 import { PluginConfig, CountModel, SyncPackageMapItem, MiddlewareConfig, SyncMap } from './index.type';
 
 export const count_index = 'npm_analysis_packages';
+export const script_id = 'npm_analysis_package_count';
 export class SyncTable {
     config: PluginConfig;
     middlewareConfig: MiddlewareConfig;
@@ -13,7 +15,23 @@ export class SyncTable {
     constructor(config: PluginConfig) {
         this.config = config;
         this.middlewareConfig = this.config.middlewares['verdaccio-package-count'];
+        this.initScript();
         this.syncSchedule();
+    }
+
+    async initScript() {
+        const elastic = getElastic(this.config);
+        try {
+            await elastic.putScript({
+                id: script_id,
+                script: {
+                    lang: 'painless',
+                    source: countScript(),
+                },
+            });
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     countPackage(package_name, version) {
@@ -35,11 +53,50 @@ export class SyncTable {
 
     private syncSchedule() {
         setInterval(async () => {
-            const now = new Date();
-            Object.values(this.syncMap).forEach((item) => {
-                this.update(item, now);
-            });
-        }, this.middlewareConfig.sync_interval || 120 * 1000);
+            // Object.values(this.syncMap).forEach((item) => {
+            //     this.update(item, now);
+            // });
+            this.bulkUpdate(this.syncMap, new Date());
+        }, 6000 || 120 * 1000);
+    }
+
+    async bulkUpdate(syncMap: SyncMap, nowDate: Date) {
+        const elastic = getElastic(this.config);
+        const operations = Object.values(syncMap).flatMap((item): [{ update: any }, any] => {
+            return [
+                { update: { _index: count_index, _id: item.name } },
+                {
+                    script: {
+                        id: script_id,
+                        params: {
+                            package_name: item.name,
+                            count: item.count,
+                            versions: item.versions,
+                            update_at: nowDate.toISOString(),
+                        },
+                    },
+                    upsert: {
+                        package_name: item.name,
+                        total: item.count,
+                        this_year: item.count,
+                        this_month: item.count,
+                        this_week: item.count,
+                        trend: [...new Array(59).fill(0), item.count],
+                        versions: item.versions || {},
+                        update_at: nowDate.toISOString(),
+                    },
+                },
+            ];
+        });
+
+        if (!operations.length) return;
+
+        try {
+            await elastic.bulk({ refresh: true, operations: operations });
+        } catch (e) {
+            console.error(e);
+        }
+        this.syncMap = {};
     }
 
     async update(package_count: SyncPackageMapItem, nowDate: Date) {

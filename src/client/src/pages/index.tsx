@@ -1,6 +1,9 @@
 import { useCount } from './hooks/useCount';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
-import { Container, Card, Title } from './index.style';
+
+import { Overlay } from './overlay';
+
+import { Container, Card, Title, ChartContainer } from './index.style';
 
 function App() {
     const package_name = location.pathname.replace('/-/web/detail/', '');
@@ -9,9 +12,12 @@ function App() {
     return (
         <Container id='download-count-32d3'>
             <Title>Downloads</Title>
-            <Sparklines data={count?.trend}>
-                <SparklinesLine color='#41c3f9' />
-            </Sparklines>
+            <ChartContainer>
+                <Overlay data={count?.trend}></Overlay>
+                <Sparklines data={count?.trend}>
+                    <SparklinesLine color='#41c3f9' />
+                </Sparklines>
+            </ChartContainer>
 
             <Card>
                 <div>This week:</div>

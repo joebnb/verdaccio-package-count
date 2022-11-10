@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './pages/index';
 import './main.css';
+import { replaceVersion } from './utils/version-repace';
 
 const MOUNT_POINT = 'download-count-root';
 
@@ -23,5 +24,5 @@ function render() {
         }
     }, 500);
 }
-
 render();
+replaceVersion();

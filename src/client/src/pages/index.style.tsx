@@ -29,3 +29,8 @@ export const Title = styled.div`
     font-size: 1rem;
     font-weight: 700;
 `;
+
+export const ChartContainer = styled.div`
+    position: relative;
+    display: flex;
+`;
