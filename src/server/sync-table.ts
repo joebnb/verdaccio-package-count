@@ -1,21 +1,23 @@
 import { getElastic } from './util/elastic';
 import { getWeekIndex } from './util/date';
-import { countScript } from './util/scripts';
+import { countScript, INDEX_MAPPING } from './util/scripts';
 
 import { PluginConfig, CountModel, SyncPackageMapItem, MiddlewareConfig, SyncMap } from './index.type';
 
-export const count_index = 'npm_analysis_packages';
-export const script_id = 'npm_analysis_package_count';
+export const script_id = '_npm_analysis_package_count';
 export class SyncTable {
     config: PluginConfig;
     middlewareConfig: MiddlewareConfig;
     filter: RegExp[];
     private syncMap: SyncMap = {};
+    count_index: string;
 
     constructor(config: PluginConfig) {
         this.config = config;
         this.middlewareConfig = this.config.middlewares['verdaccio-package-count'];
+        this.count_index = this.config.middlewares['verdaccio-package-count']?.es_index || 'npm_analysis_packages';
         this.initScript();
+        this.initIndex();
         this.syncSchedule();
     }
 
@@ -31,6 +33,17 @@ export class SyncTable {
             });
         } catch (error) {
             console.error(error);
+        }
+    }
+
+    async initIndex() {
+        const elastic = getElastic(this.config);
+        try {
+            await elastic.indices.get({ index: this.count_index });
+            console.log('[package count]INDEX AREADY CREATED');
+        } catch (error) {
+            await elastic.indices.create({ index: this.count_index, mappings: INDEX_MAPPING, settings: { refresh_interval: '600s' } });
+            console.log('[package count]INDEX CREATED');
         }
     }
 
@@ -64,7 +77,7 @@ export class SyncTable {
         const elastic = getElastic(this.config);
         const operations = Object.values(syncMap).flatMap((item): [{ update: any }, any] => {
             return [
-                { update: { _index: count_index, _id: item.name } },
+                { update: { _index: this.count_index, _id: item.name } },
                 {
                     script: {
                         id: script_id,
@@ -103,7 +116,7 @@ export class SyncTable {
         const elastic = getElastic(this.config);
         try {
             const data = await elastic.getSource<CountModel>({
-                index: count_index,
+                index: this.count_index,
                 id: package_count.name,
             });
 
@@ -122,7 +135,7 @@ export class SyncTable {
 
             // if mouth or year change, year and mouth should flush
             await elastic.index<CountModel>({
-                index: count_index,
+                index: this.count_index,
                 id: package_count.name,
                 document: {
                     total: data.total + package_count.count,
@@ -139,7 +152,7 @@ export class SyncTable {
         } catch (error) {
             if (JSON.stringify(error).indexOf('not_found_exception') != -1) {
                 let originData = {
-                    index: count_index,
+                    index: this.count_index,
                     id: package_count.name,
                     document: {
                         package_name: package_count.name,
@@ -165,7 +178,7 @@ export class SyncTable {
         const elastic = getElastic(this.config);
         try {
             return await elastic.getSource({
-                index: count_index,
+                index: this.count_index,
                 id: package_name,
             });
         } catch (error) {

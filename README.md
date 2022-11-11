@@ -1,23 +1,37 @@
 # verdaccio-download-count
 
-> An amazing verdaccio plugin
+> for npm analysis
 
 ---
 
-## development
+## prepare
+**this plugin worked with elasticsearch,so elasticsearch service is required.**
 
-See the [verdaccio contributing guide](https://github.com/verdaccio/verdaccio/blob/master/CONTRIBUTING.md) for instructions setting up your development environment. 
-Once you have completed that, use the following npm tasks.
+## install & setup
+in your verdaccio:
+```
+npm i verdaccio-package-count
+```
 
-  - `npm run build`
+in your verdaccio config.yaml
+```
+middlewares:
+  'verdaccio-package-count':
+    enable: true
+    sync_interval: 6000 # optional
+    es_index: 'indexname' # optional
+    elastic: 
+      node: 'https://localhost:9200'
+      auth: 
+        # note: the authentication one of the two is enough
+        username: elastic
+        password: your_password
+        apiKey: your_api_key   
+      tls: 
+        rejectUnauthorized: false // if you don't have ssl certificate
+```
 
-    Build a distributable archive
-
-  - `npm run test`
-
-    Run unit test
-
-For more information about any of these commands run `npm run ${task} -- --help`.
+## other
+if want remove data delete this index `npm_analysis_packages` in your elastic search.
 
 
-// package-name version total this year this month this week

@@ -1,4 +1,4 @@
-export function countScript(){
+export function countScript() {
     return `
     // parse string date
     ZonedDateTime parseDate(def dateStr) {
@@ -49,9 +49,9 @@ export function countScript(){
     
     // update versions
     for(key in params.versions.keySet()){
-      def oldount = ctx._source.versions[key];
+      def oldCount = ctx._source.versions[key];
       def newCount = params.versions[key];
-      ctx._source.versions[key] = oldount == null ? newCount : newCount + oldount;
+      ctx._source.versions[key] = oldCount == null ? newCount : newCount + oldCount;
     }
     
     // update trend
@@ -66,5 +66,39 @@ export function countScript(){
     
     ctx._source.update_at = params.update_at;    
     
-    `
+    `;
 }
+
+export const INDEX_MAPPING = {
+    properties: {
+        package_name: {
+            type: 'text',
+            fields: {
+                keyword: {
+                    type: 'keyword',
+                },
+            },
+        },
+        this_month: {
+            type: 'long',
+        },
+        this_week: {
+            type: 'long',
+        },
+        this_year: {
+            type: 'long',
+        },
+        total: {
+            type: 'long',
+        },
+        trend: {
+            type: 'long',
+        },
+        update_at: {
+            type: 'date',
+        },
+        versions: {
+            type: 'flattened',
+        },
+    },
+};

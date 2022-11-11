@@ -6,6 +6,7 @@ export interface MiddlewareConfig {
     enable: boolean;
     filter?: RegExp[];
     sync_interval?: number;
+    es_index?: string;
     elastic: {
         cloud?: string;
         node?: string;

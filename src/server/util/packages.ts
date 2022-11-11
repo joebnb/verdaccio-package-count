@@ -1,4 +1,4 @@
-export function getPackageFromUrl1(url_path: string) {
+export function getPackageFromUrl(url_path: string) {
     url_path = url_path.replace(/^\/+/, '');
 
     const haveScope = url_path[0] == '@';
@@ -6,16 +6,6 @@ export function getPackageFromUrl1(url_path: string) {
         .split('/')
         .slice(0, haveScope ? 2 : 1)
         .join('/');
-
-    if (packageName) {
-        return packageName;
-    }
-}
-
-export function getPackageFromUrl(url_path: string) {
-    url_path = url_path.replace(/^\/+/, '');
-
-    const packageName = url_path.split('/-/').shift();
 
     if (packageName) {
         return packageName;
