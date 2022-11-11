@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { debounce, throttle } from 'lodash-es';
+import { useState, useRef } from 'react';
+import { throttle } from 'lodash-es';
 
 import { Tips, Layer } from './overlay.style';
 
@@ -22,7 +22,7 @@ export const Overlay = ({ data }: { data: number[] | undefined }) => {
             const width = (ref.current as HTMLElement).getBoundingClientRect().width;
 
             const dataLen = data?.length || 0;
-            const index = Math.floor((x / width) * (dataLen-1));
+            const index = Math.floor((Math.max(x, 0) / width) * dataLen);
 
             setPos({
                 x: x - 80,
