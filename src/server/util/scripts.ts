@@ -47,11 +47,38 @@ export function countScript() {
     def thisWeekCount = curYear == oldYear && curWeekIndex == oldWeekIndex ? params.count + ctx._source.this_week : params.count;
     ctx._source.this_week= thisWeekCount;
     
+    if(ctx._source.today == null){
+      ctx._source.today = 0;
+    }
+    
+    ctx._source.today = curDay == oldDay ? params.count + ctx._source.today : params.count;
+    
     // update versions
     for(key in params.versions.keySet()){
-      def oldCount = ctx._source.versions[key];
       def newCount = params.versions[key];
-      ctx._source.versions[key] = oldCount == null ? newCount : newCount + oldCount;
+      if(newCount == null){
+        continue;
+      }
+      
+      def old7Day = ctx._source.versions[key];
+      if(old7Day instanceof ArrayList){
+        if(curDay == oldDay){
+          def lastIndex = old7Day.length - 1;
+          old7Day.set(lastIndex, old7Day[lastIndex] + newCount);
+          ctx._source.versions[key] = leftPadArray(old7Day,7);
+        } else {
+          old7Day.add(newCount);
+          ctx._source.versions[key] = leftPadArray(old7Day, 7);
+        }
+      }
+      
+      if(ctx._source.versions[key] instanceof Long || ctx._source.versions[key] instanceof Integer){
+        ctx._source.versions[key] = leftPadArray(new ArrayList([ctx._source.versions[key]]), 7);
+      }
+      
+      if(ctx._source.versions[key] == null){
+        ctx._source.versions[key] = leftPadArray([newCount], 7);
+      }
     }
     
     // update trend
@@ -59,12 +86,12 @@ export function countScript() {
       ctx._source.trend.add(params.count);
       ctx._source.trend = leftPadArray(ctx._source.trend,60);
     } else {
-      def lastIndex = ctx._source.trend.length -1;
-      def trend = ctx._source.trend.set(lastIndex,ctx._source.trend[lastIndex]+params.count);
+      def lastIndex = ctx._source.trend.length - 1;
+      ctx._source.trend.set(lastIndex,ctx._source.trend[lastIndex]+params.count);
       ctx._source.trend=leftPadArray(ctx._source.trend,60);
     }
     
-    ctx._source.update_at = params.update_at;    
+    ctx._source.update_at = params.update_at;
     
     `;
 }
@@ -78,6 +105,9 @@ export const INDEX_MAPPING = {
                     type: 'keyword',
                 },
             },
+        },
+        today: {
+            type: 'long',
         },
         this_month: {
             type: 'long',
