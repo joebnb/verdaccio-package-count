@@ -16,7 +16,7 @@ export function replaceVersion() {
                     div.style.opacity = '0.7';
                     div.style.position = 'absolute';
                     div.style.left = '50%';
-                    div.innerText = `Total: ${data.versions[currentVersion]}`;
+                    div.innerText = `Last 7 Days: ${data.versions[currentVersion]?.reduce((result: number, item: number) => result + item) || data.versions[currentVersion]}`;
                     div.className = 'npm-version-count';
                     (item as any).style = 'position:relative';
                     item.append(div);
