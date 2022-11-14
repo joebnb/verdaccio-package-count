@@ -2,11 +2,14 @@ import { useCount } from './hooks/useCount';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
 
 import { Overlay } from './overlay';
+import {getPackageFromUrl} from '../utils/package'
 
 import { Container, Card, Title, ChartContainer } from './index.style';
 
 function App() {
-    const package_name = location.pathname.replace('/-/web/detail/', '');
+    const packageInfo = location.pathname.replace('/-/web/detail/', '');
+    const package_name = getPackageFromUrl(packageInfo) || '';
+    
     const count = useCount(package_name);
 
     return (
