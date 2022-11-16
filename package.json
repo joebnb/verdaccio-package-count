@@ -1,6 +1,6 @@
 {
   "name": "verdaccio-package-count",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "An amazing verdaccio plugin",
   "main": "lib/server/index.js",
   "types": "lib/server/index.d.ts",
@@ -36,7 +36,7 @@
     "verdaccio-"
   ],
   "license": "MIT",
-  "repository": "joebnb/download-count",
+  "repository": "joebnb/verdaccio-package-count",
   "author": "joebnb <joebnb@qq.com>",
   "scripts": {
     "release": "standard-version -a -s",
