@@ -33,6 +33,7 @@ export class CountNPM {
 
     middleWare = (req: Request, res: Response, next: NextFunction) => {
         const decode_path = decodeURIComponent(req.path);
+        
         if (decode_path.indexOf('/-/analysis') == 0) {
             const package_name = decode_path.replace(/^\/-\/analysis\//, '');
             return this.syncTable.query(package_name).then((result) => res.json(result));
