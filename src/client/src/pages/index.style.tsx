@@ -35,3 +35,21 @@ export const ChartContainer = styled.div`
     display: flex;
     flex:1;
 `;
+
+
+export const Overlay = styled.div`
+pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    background-color: rgba(120,120,120,0.6);
+    color:#fff;
+    border-radius: 3px;
+`

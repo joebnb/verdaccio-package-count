@@ -1,12 +1,12 @@
 import { useState, useRef } from 'react';
 import { throttle } from 'lodash-es';
 
-import { Tips, Layer } from './overlay.style';
+import { Tips, Layer } from './tooltip.style';
 
 const thrott = throttle((callback) => {
     callback();
-}, 20);
-export const Overlay = ({ data }: { data: number[] | undefined }) => {
+}, 10);
+export const Tooltip = ({ data }: { data: number[] | undefined }) => {
     const ref = useRef(null);
     const [pos, setPos] = useState<{ x?: number; y?: number; visibility: 'visible' | 'hidden'; text?: string }>({
         x: 0,
