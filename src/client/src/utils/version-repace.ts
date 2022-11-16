@@ -10,13 +10,13 @@ export function replaceVersion() {
             const isRenderd = !!document.getElementsByClassName('npm-version-count').length;
             if (isRenderd) return;
             Array.from(versionItems).forEach((item) => {
-                const currentVersion = item.childNodes[0].textContent || '';
-                if (currentVersion && data.versions[currentVersion]) {
+                const currentVersion = item?.childNodes[0]?.textContent || '';
+                if (currentVersion && data?.versions[currentVersion]?.length) {
                     const div = document.createElement('div');
-                    div.style.opacity = '0.7';
+                    div.style.color = '#999';
                     div.style.position = 'absolute';
                     div.style.left = '50%';
-                    div.innerText = `Relative 7 Days: ${data.versions[currentVersion]?.reduce((result: number, item: number) => result + item) || data.versions[currentVersion]}`;
+                    div.innerText = `Last 7 days: ${data?.versions[currentVersion]?.reduce((result: number, item: number) => (result || 0) + item)}`;
                     div.className = 'npm-version-count';
                     (item as any).style = 'position:relative';
                     item.append(div);

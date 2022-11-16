@@ -33,4 +33,5 @@ export const Title = styled.div`
 export const ChartContainer = styled.div`
     position: relative;
     display: flex;
+    flex:1;
 `;
