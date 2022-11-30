@@ -23,8 +23,8 @@ export function countScript() {
       return new ArrayList(Arrays.asList(newArr));
     }
     
-    long getDayPeriod(def oldDate,def curDate){
-      return Duration.between(curDate,oldDate).toDays();
+    long getDayPeriod(def oldDate,def newDate){
+      return Period.between(oldDate.toLocalDate(),newDate.toLocalDate()).getDays();
     }
     
     int getWeekPeriod(def oldDate,def curDate){
@@ -76,6 +76,8 @@ export function countScript() {
     def curDay = curDate.getDayOfMonth();
     def oldDay = oldDate.getDayOfMonth();
     
+    def dayPeriod = getDayPeriod(oldDate, curDate);
+    
     def curWeekIndex = getWeekIndexOfYear(curDate,"MONDAY");
     def oldWeekIndex =  getWeekIndexOfYear(oldDate,"MONDAY");
     
@@ -92,28 +94,28 @@ export function countScript() {
       ctx._source.today = 0;
     }
     
-    ctx._source.today = curDay == oldDay ? params.count + ctx._source.today : params.count;
+    ctx._source.today = dayPeriod == 0 ? params.count + ctx._source.today : params.count;
     
     // update versions
-    for(key in params.versions.keySet()){
-      def newCount = params.versions[key];
-      if(newCount == null){
-        continue;
-      }
-      
+    for(key in ctx._source.versions.keySet()){
       def dayListLength = 7;
       def old7Day = ctx._source.versions[key];
+      
+      def newCount = params.versions[key];
       if(old7Day instanceof ArrayList){
-        if(curYear == oldYear && curMonth == oldMonth && curDay == oldDay){
+        if(dayPeriod == 0){
+          if(newCount == null){
+            continue;
+          }
           def lastIndex = old7Day.length - 1;
           old7Day.set(lastIndex, old7Day[lastIndex] + newCount);
           ctx._source.versions[key] = leftPadArray(old7Day, dayListLength);
         } else {
-          def dayPeriod = getDayPeriod(curDate,oldDate);
-          for(int i = 1;i< dayPeriod && i <= dayListLength; i++){
+          // only count 7 day so the loop in maxium could execute 7 time
+          for(int i = 1;i <= dayPeriod && i < dayListLength; i++){
             old7Day.add(0);
           }
-          old7Day.add(newCount);
+          old7Day.add(newCount == null ? 0 : newCount);
           ctx._source.versions[key] = leftPadArray(old7Day, dayListLength);
         }
       }

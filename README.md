@@ -46,3 +46,6 @@ middlewares:
 if want remove data delete this index `_npm_analysis_package_count` in your elastic search.
 
 
+## change log
+### 1.0.0
+* fix last 7 day count can't refresh bug

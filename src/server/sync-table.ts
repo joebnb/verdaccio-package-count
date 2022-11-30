@@ -4,6 +4,7 @@ import { countScript, INDEX_MAPPING } from './util/scripts';
 import { PluginConfig, MiddlewareConfig, SyncMap } from './index.type';
 
 export const script_id = '_npm_analysis_package_count';
+
 export class SyncTable {
     config: PluginConfig;
     middlewareConfig: MiddlewareConfig;
