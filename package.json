@@ -1,6 +1,6 @@
 {
   "name": "verdaccio-package-count",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An amazing verdaccio plugin",
   "main": "lib/server/index.js",
   "types": "lib/server/index.d.ts",

@@ -112,7 +112,7 @@ export function countScript() {
           ctx._source.versions[key] = leftPadArray(old7Day, dayListLength);
         } else {
           // only count 7 day so the loop in maxium could execute 7 time
-          for(int i = 1;i <= dayPeriod && i < dayListLength; i++){
+          for(int i = 1;i < dayPeriod && i < dayListLength; i++){
             old7Day.add(0);
           }
           old7Day.add(newCount == null ? 0 : newCount);
