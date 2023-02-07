@@ -69,7 +69,7 @@ export class SyncTable {
     }
 
     private syncSchedule() {
-        setInterval(async () => this.bulkUpdate(this.syncMap, new Date()), 3000 || this.middlewareConfig.sync_interval || 600 * 1000);
+        setInterval(async () => this.bulkUpdate(this.syncMap, new Date()), this.middlewareConfig.sync_interval || 600 * 1000);
     }
 
     async bulkUpdate(syncMap: SyncMap, nowDate: Date) {
