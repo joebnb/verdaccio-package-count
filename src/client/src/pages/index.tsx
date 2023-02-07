@@ -21,8 +21,8 @@ function App() {
                 {deltaDay > 7 ? (
                     <Overlay>
                         <div>
-                            <div>No download record recent week.</div>
-                            <div>Last update was: {updateAt.toLocaleDateString()}</div>
+                            <div>No download record recent.</div>
+                            <div>Last update at: {updateAt.toLocaleDateString()}</div>
                         </div>
                     </Overlay>
                 ) : null}

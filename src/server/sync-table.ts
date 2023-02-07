@@ -69,7 +69,7 @@ export class SyncTable {
     }
 
     private syncSchedule() {
-        setInterval(async () => this.bulkUpdate(this.syncMap, new Date()), this.middlewareConfig.sync_interval || 600 * 1000);
+        setInterval(async () => this.bulkUpdate(this.syncMap, new Date()), 3000 || this.middlewareConfig.sync_interval || 600 * 1000);
     }
 
     async bulkUpdate(syncMap: SyncMap, nowDate: Date) {
@@ -125,9 +125,9 @@ export class SyncTable {
                 id: package_name,
             });
         } catch (error) {
-            console.error(error);
             if (JSON.stringify(error).indexOf('not_found_exception')) return { error: 'no_record' };
 
+            console.error(error);
             return { error: error?.name || 'unknow error but catched' };
         }
     }

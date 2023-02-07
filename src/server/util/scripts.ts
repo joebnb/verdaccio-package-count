@@ -64,6 +64,13 @@ export function countScript() {
         int offset = monthInterval % 12 + oldDate.getMonthValue()  > 12 ? 1 : 0;
         return yearInterval + offset;
     }
+    
+    boolean isZeroIntList(def arrayList){
+      for(int i=0; i < arrayList.length; i++){
+        if(arrayList[i] != 0) return false;
+      }
+      return true;
+    }
       
     def curDate= parseDate(params.update_at);
     def oldDate= parseDate(ctx._source.update_at);
@@ -96,17 +103,19 @@ export function countScript() {
     
     ctx._source.today = dayPeriod == 0 ? params.count + ctx._source.today : params.count;
     
-    // update versions
-    for(key in ctx._source.versions.keySet()){
+    def versions = new HashSet();
+    versions.addAll(ctx._source.versions.keySet());
+    versions.addAll(params.versions.keySet());
+    
+    // update versions main process
+    for(key in versions){
       def dayListLength = 7;
       def old7Day = ctx._source.versions[key];
       
-      def newCount = params.versions[key];
+      def newCount = params.versions[key] == null ? 0 : params.versions[key];
+            
       if(old7Day instanceof ArrayList){
         if(dayPeriod == 0){
-          if(newCount == null){
-            continue;
-          }
           def lastIndex = old7Day.length - 1;
           old7Day.set(lastIndex, old7Day[lastIndex] + newCount);
           ctx._source.versions[key] = leftPadArray(old7Day, dayListLength);
@@ -115,11 +124,12 @@ export function countScript() {
           for(int i = 1;i < dayPeriod && i < dayListLength; i++){
             old7Day.add(0);
           }
-          old7Day.add(newCount == null ? 0 : newCount);
+          old7Day.add(newCount);
           ctx._source.versions[key] = leftPadArray(old7Day, dayListLength);
         }
       }
       
+      // compatible for old data,covert it to arrayList
       if(ctx._source.versions[key] instanceof Long || ctx._source.versions[key] instanceof Integer){
         ctx._source.versions[key] = leftPadArray(new ArrayList([ctx._source.versions[key]]), 7);
       }
@@ -127,11 +137,17 @@ export function countScript() {
       if(ctx._source.versions[key] == null){
         ctx._source.versions[key] = leftPadArray([newCount], 7);
       }
+      
+      
+      if(ctx._source.versions[key] instanceof ArrayList && isZeroIntList(ctx._source.versions[key])){ 
+        ctx._source.versions.remove(key);
+      }
+      
     }
-    
+
     // update trend
     if(curYear != oldYear || curWeekIndex != oldWeekIndex){
-      def weekPeriod = getWeekPeriod(curDate,oldDate);
+    def weekPeriod = getWeekPeriod(curDate,oldDate);
       for(int i = 1;i< weekPeriod; i++){
             ctx._source.trend.add(0);
       }
