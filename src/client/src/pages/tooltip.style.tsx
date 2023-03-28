@@ -6,12 +6,13 @@ export const Tips = styled.div<{ pos: any }>`
     color: #fff;
     background-color: rgba(0, 0, 0, 0.7);
     width: auto;
-    min-width: 180px;
+    min-width: 200px;
     display: inline-block;
     white-space: pre-wrap;
     border-radius: 4px;
     padding: 4px 8px;
     z-index: 2;
+    font-size: 14px;
     left: ${({ pos }) => `${pos.x}px`};
     top: ${({ pos }) => `${pos.y}px`};
     visibility: ${({ pos }) => pos.visibility};
