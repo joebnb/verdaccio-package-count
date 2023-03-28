@@ -6,7 +6,7 @@ export const Tips = styled.div<{ pos: any }>`
     color: #fff;
     background-color: rgba(0, 0, 0, 0.7);
     width: auto;
-    min-width: 200px;
+    min-width: 180px;
     display: inline-block;
     white-space: pre-wrap;
     border-radius: 4px;
