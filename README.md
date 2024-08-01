@@ -13,7 +13,7 @@ Features:
 * good caching and bulk ES side scripting,low affect to npm and elasticsearch service
 ---
 
-## Prepare
+## Notice
 **IMPORTANT:This plugin worked with elasticsearch,so elasticsearch service is required.(other wise es client will throw error at init stage)**
 
 tested on verdaccio 5.x,if some error occored you should remove es index and restart service again(in old version,es mapping is incorrect,delete and restart will create a correct index)
